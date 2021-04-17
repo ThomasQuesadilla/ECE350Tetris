@@ -141,7 +141,7 @@ module VGAControllerTetris(
 			active_block_x = active_block_x + 1; // To make jumps less big
 
 		// Trying to switch blocks --> this assignment doesn't work will need to think about it tmrw
-		if (right && active_block_x + active_block_width > PLAYAREA_END)
+		if (active_block_y + active_block_width >= VIDEO_HEIGHT)
 			new_block_rdy = 1'b1;
 	end
 	always @(posedge screenEnd) begin

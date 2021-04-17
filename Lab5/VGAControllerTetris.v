@@ -18,8 +18,8 @@ module VGAControllerTetris(
 	// need to do some sort of mux logic to switch from one block to the next, not sure if this will work
 	reg[9:0] active_block_x = 296;
 	reg[8:0] active_block_y = 0;
-	reg[9:0] active_block_width = 48;
-	reg[8:0] active_block_height = new_block_rdy ? 96 : 48; // we switch between blocks
+	reg[9:0] active_block_height = 48;
+	reg[8:0] active_block_width = new_block_rdy ? 96 : 48; // we switch between blocks
 
 	
 
@@ -141,7 +141,7 @@ module VGAControllerTetris(
 			active_block_x = active_block_x + 1; // To make jumps less big
 
 		// Trying to switch blocks --> this assignment doesn't work will need to think about it tmrw
-		if (active_block_y + active_block_width >= VIDEO_HEIGHT)
+		if (active_block_y + active_block_height >= VIDEO_HEIGHT)
 			new_block_rdy = 1'b1;
 	end
 	always @(posedge screenEnd) begin

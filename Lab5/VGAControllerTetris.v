@@ -14,7 +14,16 @@ module VGAControllerTetris(
 	inout ps2_clk,
 	inout ps2_data);
 
-	reg new_block_rdy;
+	// 4 different types of blocks: square, rectangle, upside down T block, L block and side L block
+	// use processor randomizer to choose what block to use :))), we will create a new instruction
+	// Assign bits to each type:
+	// square: 000
+	// rectangle: 001
+	// t-block: 010
+	// L block: 011
+	// L side block: 100
+
+	reg new_block_rdy = 0;
 	// need to do some sort of mux logic to switch from one block to the next, not sure if this will work
 	reg[9:0] active_block_x = 296;
 	reg[8:0] active_block_y = 0;
@@ -142,7 +151,7 @@ module VGAControllerTetris(
 
 		// Trying to switch blocks --> this assignment doesn't work will need to think about it tmrw
 		if (active_block_y + active_block_height >= VIDEO_HEIGHT)
-			new_block_rdy = 1'b1;
+			new_block_rdy = 1;
 	end
 	always @(posedge screenEnd) begin
 	end

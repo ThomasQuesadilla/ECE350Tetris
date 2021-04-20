@@ -14,14 +14,12 @@ module VGAControllerTetris(
 	inout ps2_clk,
 	inout ps2_data);
 
-	reg new_block_rdy;
+	reg new_block_rdy = 0;
 	// need to do some sort of mux logic to switch from one block to the next, not sure if this will work
 	reg[9:0] active_block_x = 296;
 	reg[8:0] active_block_y = 0;
 	reg[9:0] active_block_height = 48;
 	reg[8:0] active_block_width = new_block_rdy ? 96 : 48; // we switch between blocks
-
-	
 
 
 	// Lab Memory Files Location
@@ -46,6 +44,9 @@ module VGAControllerTetris(
 	localparam 
 		PLAYAREA_START = 200, // VIDEO_WIDTH/2 - 130
 		PLAYAREA_END = 440;	  // VIDEO_WIDTH/2 + 130
+
+	reg placedblocks [239:0][479:0];
+
 
 	wire active, screenEnd;
 	wire[9:0] x;
@@ -105,14 +106,25 @@ module VGAControllerTetris(
 
 	wire[BITS_PER_COLOR-1:0] colorOut; 			  // Output color 
 	wire[BITS_PER_COLOR-1:0] colorActive; 		  // Output color 
-	wire inBlock;
+	wire inBlock, inPlaced;
 	
 	assign inBlock = (x > active_block_x && x < active_block_x + active_block_width) && (y > active_block_y && y < active_block_y + active_block_height);
-	assign colorActive = inBlock ? 12'd0 : colorData;
+	assign inPlaced = placedblocks[x][y] == 1;
+	assign colorActive = inBlock || inPlaced ? 12'd0 : colorData;
 	assign colorOut = active ? colorActive : 12'd0; // When not active, output black
 
 	// Quickly assign the output colors to their channels using concatenation
 	assign {VGA_R, VGA_G, VGA_B} = colorOut; 
+
+	task add_to_placedblocks;
+		//integer assignment used to convert x and y binary values to int for indexing (unsure if it works without)
+		integer x_in, y_in;
+		if (inBlock) begin
+			x_in = x - PLAYAREA_START;
+			y_in = y;
+			placedblocks[x_in][y_in] = 1'b1;
+		end
+	endtask
 
 	wire[10:0] freq;
 	wire[31:0] counterlimit;
@@ -130,7 +142,7 @@ module VGAControllerTetris(
     end
 	always @(posedge clkFreq) begin
 		// we drop
-		if (active_block_y + active_block_height < 480)
+		if (active_block_y + active_block_height < VIDEO_HEIGHT)
 			active_block_y = active_block_y + 1;
 		// we move left to right during dropping
 		if (left && active_block_x > PLAYAREA_START)
@@ -140,12 +152,17 @@ module VGAControllerTetris(
 			//active_block_x = active_block_x + 24;
 			active_block_x = active_block_x + 1; // To make jumps less big
 
-		// Trying to switch blocks --> this assignment doesn't work will need to think about it tmrw
-		if (active_block_y + active_block_height >= VIDEO_HEIGHT)
+		// missing case where block underneath is active_block_x < x < active_block_x + active_block_width, not inclusive
+		if ((active_block_y + active_block_height >= VIDEO_HEIGHT) || placedblocks[active_block_x-PLAYAREA_START][active_block_y + active_block_height + 1] == 1 || placedblocks[active_block_x + active_block_width-PLAYAREA_START][active_block_y + active_block_height + 1] == 1)  begin
+			add_to_placedblocks();
+			active_block_x = 296;
+			active_block_y = 0;
 			new_block_rdy = 1'b1;
+		end
 	end
 	always @(posedge screenEnd) begin
 	end
 
+	
 	
 endmodule

@@ -14,7 +14,7 @@ module VGAControllerTetris(
 	inout ps2_clk,
 	inout ps2_data);
 
-	reg new_block_rdy;
+	reg new_block_rdy = 1'b0;
 	// need to do some sort of mux logic to switch from one block to the next, not sure if this will work
 	reg[9:0] active_block_x = 296;
 	reg[8:0] active_block_y = 0;
@@ -25,7 +25,8 @@ module VGAControllerTetris(
 
 
 	// Lab Memory Files Location
-	localparam FILES_PATH = "C:/Users/eve65/Downloads/ECE350Tetris/Lab5/";
+	localparam FILES_PATH = "//tsclient/ECE350-Toolchain-Mac/Lab5/";
+	// localparam FILES_PATH = "C:/Users/eve65/Downloads/ECE350Tetris/Lab5/";
 	localparam MHz = 1000000;
 	localparam SYSTEM_FREQ = 25*MHz;
 	// Clock divider 100 MHz -> 25 MHz
@@ -46,6 +47,10 @@ module VGAControllerTetris(
 	localparam 
 		PLAYAREA_START = 200, // VIDEO_WIDTH/2 - 130
 		PLAYAREA_END = 440;	  // VIDEO_WIDTH/2 + 130
+	
+	//Block size in pixels
+	localparam
+		BLOCK_SIZE = 24;
 
 	wire active, screenEnd;
 	wire[9:0] x;
@@ -114,31 +119,40 @@ module VGAControllerTetris(
 	// Quickly assign the output colors to their channels using concatenation
 	assign {VGA_R, VGA_G, VGA_B} = colorOut; 
 
-	wire[10:0] freq;
-	wire[31:0] counterlimit;
-	reg clkFreq = 0;
-	reg[31:0] counter;
-	assign freq = 100;
-	assign counterlimit = ((SYSTEM_FREQ / freq) >> 1) - 1;
+	wire right_en, left_en;
+
+
+	wire[10:0] gameFreq;
+	wire[31:0] game_counterlimit;
+	reg gameclk = 0;
+	reg[31:0] game_counter;
+	assign gameFreq = 1; // 1 HZ
+	assign game_counterlimit = ((SYSTEM_FREQ / gameFreq) >> 1) - 1;
+	
 	always @(posedge clk25) begin
-		if(counter < counterlimit)
-			counter <= counter + 1;
-		else begin
-			counter <= 0;
-			clkFreq = ~clkFreq;
+		if(game_counter < game_counterlimit) begin
+			game_counter <= game_counter + 1;
+			gameclk <= 0;
+		end else begin
+			game_counter <= 0;
+			gameclk <= 1;
 		end
     end
-	always @(posedge clkFreq) begin
-		// we drop
-		if (active_block_y + active_block_height < 480)
-			active_block_y = active_block_y + 1;
+
+	debouncer db_right(.pb(right), .clk(clk25), .pb_down(right_en));
+	debouncer db_left(.pb(left), .clk(clk25), .pb_down(left_en));
+	
+	always @(posedge clk25) begin
+		// we drop by 1 each time
+		if (gameclk && (active_block_y + active_block_height < 480))
+			active_block_y = active_block_y + BLOCK_SIZE;
 		// we move left to right during dropping
-		if (left && active_block_x > PLAYAREA_START)
-			// active_block_x = active_block_x - 24;
-			active_block_x = active_block_x - 1; // To make jumps less big
-		if (right && active_block_x + active_block_width < PLAYAREA_END)
-			//active_block_x = active_block_x + 24;
-			active_block_x = active_block_x + 1; // To make jumps less big
+		if (left_en && active_block_x > PLAYAREA_START)
+			active_block_x = active_block_x - BLOCK_SIZE;
+			// active_block_x = active_block_x - 1; // To make jumps less big
+		if (right_en && active_block_x + active_block_width < PLAYAREA_END)
+			active_block_x = active_block_x + BLOCK_SIZE;
+			// active_block_x = active_block_x + 1; // To make jumps less big
 
 		// Trying to switch blocks --> this assignment doesn't work will need to think about it tmrw
 		if (active_block_y + active_block_height >= VIDEO_HEIGHT)

@@ -53,6 +53,8 @@ module VGAControllerTetris(
 	localparam
 		BLOCK_SIZE = 32;
 
+	//Formula for indexing is (x - offset) / 32 + (y * desired width) / 32
+	//aka ((x - 160) >> 5) + (y * 10) >> 5, 
 	reg [149:0]placedblocks = 150'b0;
 
 	wire active, screenEnd;
@@ -220,6 +222,8 @@ module VGAControllerTetris(
 
 		// missing case where block underneath is active_block_x < x < active_block_x + active_block_width, not inclusive
 	end
+	// case statement to add block to bus, doesn't work with if for some reason, at least not in prior @always
+	// feel free to play around with it
 	always @(posedge place_block) begin
 			// for (i = 0; i < active_block_grid_height; i = i+1) begin
 			// 	for ( j = 0; i < active_block_grid_width; j = j+1) begin

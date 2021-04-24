@@ -23,8 +23,8 @@ module VGAControllerTetris(
 	reg[1:0] block_type = 2'b0;
 
 	// Lab Memory Files Location
-	localparam FILES_PATH = "//tsclient/ECE350-Toolchain-Mac/ECE350Tetris/Lab5/";
-	// localparam FILES_PATH = "C:/Users/eve65/Downloads/ECE350Tetris/Lab5/";
+	// localparam FILES_PATH = "//tsclient/ECE350-Toolchain-Mac/ECE350Tetris/Lab5/";
+	localparam FILES_PATH = "C:/Users/eve65/Downloads/ECE350Tetris/Lab5/";
 	localparam MHz = 1000000;
 	localparam SYSTEM_FREQ = 25*MHz;
 	// Clock divider 100 MHz -> 25 MHz
@@ -137,7 +137,7 @@ module VGAControllerTetris(
 	assign placedblocks_ind = inPlayArea ?  pixel_x_ind + pixel_y_ind: 0;
 	assign inPlaced = placedblocks[placedblocks_ind] == 1'b1;
 
-	assign colorActive = inBlock || inPlaced ? 12'd0 : colorData;
+	assign colorActive = inBlock || inPlaced ? 12'd4095 : colorData;
 	assign colorOut = active ? colorActive : 12'd0; // When not active, output black
 
 	// Quickly assign the output colors to their channels using concatenation

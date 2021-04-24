@@ -44,7 +44,7 @@ module processor(
     data_readRegB,                   // I: Data from port B of RegFile
 
     // Tetris
-    ctrl_lnf);
+    data_lnf);
 
 	// Control signals
 	input clock, reset;
@@ -65,7 +65,7 @@ module processor(
 	input [31:0] data_readRegA, data_readRegB;
 
     // Tetris
-    output ctrl_lnf;
+    output [1:0] data_lnf;
 
 	/* YOUR CODE STARTS HERE */
 
@@ -229,6 +229,7 @@ module processor(
     linear_register lnf(lnf_out, clock, alu_A[0]); // new instruction implementation
     // assign wire_lnf_out = lnf_out;
     extend_3_32 e32(lnf_out, extend_lnf);
+    assign data_lnf = is_lnf ? lnf_out : 2'b00;
 
     wire do_blt, do_bne, do_linear;
     assign do_blt = is_NE & is_blt;

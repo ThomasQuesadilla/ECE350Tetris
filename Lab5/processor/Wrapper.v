@@ -72,7 +72,7 @@ module Wrapper (
 		.data(memDataIn), .q_dmem(memDataOut),
 		
 		// Tetris
-		.ctrl_lnf(ctrl_lnf)); 
+		.data_lnf(random_block)); 
 	
 	// Instruction Memory (ROM)
 	ROM #(.MEMFILE({INSTR_FILE, ".mem"}))
@@ -95,6 +95,6 @@ module Wrapper (
 		.dataOut(memDataOut));
 	
 	// VGA Controller (Tetris)
-	VGAControllerTetris tetris(clock, reset, up, down, left, right, hSync, vSync, VGA_R, VGA_G, VGA_B, ps2_clk, ps2_data, rData[1:0]);
+	VGAControllerTetris tetris(clock, reset, up, down, left, right, hSync, vSync, VGA_R, VGA_G, VGA_B, ps2_clk, ps2_data, random_block);
 
 endmodule

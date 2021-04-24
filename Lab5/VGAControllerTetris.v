@@ -13,7 +13,8 @@ module VGAControllerTetris(
 	output[3:0] VGA_G,  // Green Signal Bits
 	output[3:0] VGA_B,  // Blue Signal Bits
 	inout ps2_clk,
-	inout ps2_data);
+	inout ps2_data,
+	input [1:0] random_block);
 
 	// block randomizer
 	// wire [9:0] active_block_height1;
@@ -31,7 +32,15 @@ module VGAControllerTetris(
 	reg[8:0] active_block_y;
 	reg[9:0] active_block_height = 64;
 	reg[8:0] active_block_width = 64; // we switch between blocks
-	reg[1:0] block_type = 2'b0;
+
+
+	// reg[1:0] block_type = 2'b0;
+	
+	reg[1:0] block_type;
+	always@(random_block) begin
+	   block_type <= random_block;
+	end
+	
 
 	// Lab Memory Files Location
 	// localparam FILES_PATH = "//tsclient/ECE350-Toolchain-Mac/Lab5/";

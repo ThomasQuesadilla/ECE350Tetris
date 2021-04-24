@@ -88,13 +88,13 @@ module Wrapper (
 		.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB));
 						
 	// Processor Memory (RAM)
-	RAM ProcMem(.clk(clock), 
+	RAM1 ProcMem(.clk(clock), 
 		.wEn(mwe), 
 		.addr(memAddr[11:0]), 
 		.dataIn(memDataIn), 
 		.dataOut(memDataOut));
 	
 	// VGA Controller (Tetris)
-	VGAControllerTetris tetris(clock, reset, rData[1:0], left, right, hSync, vSync, VGA_R, VGA_G, VGA_B, ps2_clk, ps2_data);
+	VGAControllerTetris tetris(clock, reset, up, down, left, right, hSync, vSync, VGA_R, VGA_G, VGA_B, ps2_clk, ps2_data, rData[1:0]);
 
 endmodule

@@ -2,6 +2,7 @@
 module VGAControllerTetris(     
 	input clk, 			// 100 MHz System Clock
 	input reset, 		// Reset Signal
+	// input [1:0] random_block, // Which block to choose
 	input up,
 	input down,
 	input left,
@@ -14,7 +15,17 @@ module VGAControllerTetris(
 	inout ps2_clk,
 	inout ps2_data);
 
-	reg new_block_rdy = 1'b0;
+	// block randomizer
+	// wire [9:0] active_block_height1;
+	// wire [8:0] active_block_width1;
+	// reg[9:0] active_block_height;
+	// reg[8:0] active_block_width; // we switch between blocks
+	// randomizer rand(random_block, active_block_height1, active_block_width1);
+	// always @(active_block_height1, active_block_width1) begin
+	// 	active_block_height = active_block_height1;
+	// 	active_block_width = active_block_width1;
+	// end
+	reg new_block_rdy = 0;
 	// need to do some sort of mux logic to switch from one block to the next, not sure if this will work
 	reg[9:0] active_block_x;
 	reg[8:0] active_block_y;
@@ -23,7 +34,7 @@ module VGAControllerTetris(
 	reg[1:0] block_type = 2'b0;
 
 	// Lab Memory Files Location
-	// localparam FILES_PATH = "//tsclient/ECE350-Toolchain-Mac/ECE350Tetris/Lab5/";
+	// localparam FILES_PATH = "//tsclient/ECE350-Toolchain-Mac/Lab5/";
 	localparam FILES_PATH = "C:/Users/eve65/Downloads/ECE350Tetris/Lab5/";
 	localparam MHz = 1000000;
 	localparam SYSTEM_FREQ = 25*MHz;
@@ -283,6 +294,8 @@ module VGAControllerTetris(
 	// end
 	always @(posedge screenEnd) begin
 	end
+	// always @(posedge screenEnd) begin
+	// end
 
 	
 	

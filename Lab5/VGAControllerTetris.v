@@ -123,7 +123,7 @@ module VGAControllerTetris(
 	
 	assign x_ind = ((active_block_x - PLAYAREA_START) >> 5) + 1;
 	assign y_ind = (active_block_y >> 5) * GRID_WIDTH;
-	assign x_width_ind = ((active_block_x + active_block_width - PLAYAREA_START) >> 5) - 1 ;
+	assign x_width_ind = ((active_block_x + active_block_width - PLAYAREA_START) >> 5);
 	assign y_height_ind = ((active_block_y + active_block_height) >> 5) * GRID_WIDTH;
 	assign active_block_grid_width = active_block_width >> 5;
 	assign active_block_grid_height = active_block_height >> 5;
@@ -195,7 +195,7 @@ module VGAControllerTetris(
 	end
 
 	wire shift;
-	wire[7:0] placedblocks_h;
+	wire[8:0] placedblocks_h;
 	assign shift = &placedblocks[row +: 9];
 	reg[7:0] row;
 	assign placedblocks_h = 149 - row;
@@ -268,9 +268,9 @@ module VGAControllerTetris(
 				placedblocks[row +: 9] <= 10'b0;
 			end else begin
 				for (i = 0; i < placedblocks_h; i = i +10) begin
-					placedblocks[row - i+: 9] <= placedblocks[row - i -10 +: 9];
+					placedblocks[row - i+: 10] <= placedblocks[row - i -10 +: 10];
 				end
-				placedblocks[149 : 140] <= 10'b0;
+				placedblocks[9 : 0] <= 10'b0;
 				row <= row - 10;
 			end
 		end

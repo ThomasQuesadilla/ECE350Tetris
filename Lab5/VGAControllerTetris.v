@@ -17,24 +17,24 @@ module VGAControllerTetris(
 	input [1:0] random_block);
 
 	// block randomizer
-	wire [9:0] active_block_height1;
-	wire [8:0] active_block_width1;
-	reg[9:0] active_block_height;
-	reg[8:0] active_block_width; // we switch between blocks
-	randomizer rand(random_block, active_block_height1, active_block_width1);
-	always @(active_block_height1) begin
-		active_block_height <= active_block_height1;
-	end
+	// wire [9:0] active_block_height1;
+	// wire [8:0] active_block_width1;
+	// reg[9:0] active_block_height;
+	// reg[8:0] active_block_width; // we switch between blocks
+	// randomizer rand(random_block, active_block_height1, active_block_width1);
+	// always @(active_block_height1) begin
+	// 	active_block_height <= active_block_height1;
+	// end
 
-	always @(active_block_width1) begin
-		active_block_width <= active_block_width1;
-	end
+	// always @(active_block_width1) begin
+	// 	active_block_width <= active_block_width1;
+	// end
 	reg new_block_rdy = 0;
 	// need to do some sort of mux logic to switch from one block to the next, not sure if this will work
 	reg[9:0] active_block_x;
 	reg[8:0] active_block_y;
-	// reg[9:0] active_block_height = 64;
-	// reg[8:0] active_block_width = 64; // we switch between blocks
+	reg[9:0] active_block_height = 64;
+	reg[8:0] active_block_width = 64; // we switch between blocks
 
 
 	// reg[1:0] block_type = 2'b11;
@@ -341,8 +341,8 @@ module VGAControllerTetris(
 	// 	// 	placedblocks[n] <= placedblocks_rev[149-n]; // Reverse video data buss bit order 
 	// 	// end 
 	// end
-	always @(posedge screenEnd) begin
-	end
+	// always @(posedge screenEnd) begin
+	// end
 	// always @(posedge screenEnd) begin
 	// end
 

@@ -146,7 +146,7 @@ module VGAControllerTetris(
 	
 	assign x_ind = ((active_block_x - PLAYAREA_START) >> 5) + 1;
 	assign y_ind = (active_block_y >> 5) * GRID_WIDTH;
-	assign x_width_ind = ((active_block_x + active_block_grid_width - PLAYAREA_START) >> 5) + 1;
+	assign x_width_ind = ((active_block_x + active_block_width - PLAYAREA_START) >> 5) - 1 ;
 	assign y_height_ind = ((active_block_y + active_block_height) >> 5) * GRID_WIDTH;
 	assign active_block_grid_width = active_block_width >> 5;
 	assign active_block_grid_height = active_block_height >> 5;
@@ -166,6 +166,16 @@ module VGAControllerTetris(
 	// Quickly assign the output colors to their channels using concatenation
 	assign {VGA_R, VGA_G, VGA_B} = colorOut; 
 
+	wire test_intersects, test_intersects_LR; 
+	wire[5:0] grid_block_width, grid_block_height;
+	reg [3:0] under_intersect, l_intersect, r_intersect;
+
+	assign grid_block_width =  block_type[1] ? (block_type[0] ? 6'd2 : 6'd4) : (block_type[0] ? 6'd1 : 6'd2);
+	assign grid_block_height =  block_type[1] ? (block_type[0] ? 6'd2 : 6'd1) : (block_type[0] ? 6'd4 : 6'd2);
+
+	assign test_intersects = |under_intersect;
+	assign test_l_intersect = |l_intersect;
+	assign test_r_intersect = |r_intersect;
 
 	wire[10:0] gameFreq;
 	wire[31:0] game_counterlimit;
@@ -174,8 +184,7 @@ module VGAControllerTetris(
 	assign gameFreq = 1; // 1 HZ
 	assign game_counterlimit = ((SYSTEM_FREQ / gameFreq) >> 1) - 1;
 	// assign test_intersects = placedblocks[(active_block_x - PLAYAREA_START) >> 5 + ((active_block_y + active_block_height + BLOCK_SIZE ) * GRID_WIDTH) >> 5] == 1'b1 || placedblocks[(active_block_x + active_block_width - PLAYAREA_START) >> 5 + (active_block_y + active_block_height + BLOCK_SIZE ) * GRID_WIDTH] == 1;
-	assign test_intersects = placedblocks[(x_ind + y_ind + 10)] == 1 
-							 | placedblocks[(x_ind + y_ind + 11)] == 1;
+	
 	
 	always @(posedge clk25) begin
 		if(game_counter < game_counterlimit) begin
@@ -200,25 +209,42 @@ module VGAControllerTetris(
 
 	wire gameover;
 	assign gameover = |placedblocks[149:140];
-
-	wire test_intersects_LR;
-	// assign test_intersects_LR = 
+	
+	// wire clearline0, clearline1, clearline2, clearline3, clearline4, clearline5, clearline6, clearline7, clearline8, clearline9, clearline10, clearline11, clearline12, clearline13, clearline14, clearline15;
 
 	initial begin
 		active_block_x <= 288;
 		active_block_y <= 0;
 	end
-	
-	integer i, j, n;
+
+	wire shift;
+	wire[7:0] placedblocks_h;
+	assign shift = &placedblocks[row +: 9];
+	reg[7:0] row;
+	assign placedblocks_h = 149 - row;
+
+	integer i, j, n, p, q;
 	always @(posedge clk25) begin
 		// we drop by 1 each time
+		if (row == 8'd140) begin
+			row <= 8'd0;
+		end else begin
+			row <= row + 10;
+		end
 		if (gameclk && (active_block_y + active_block_height < 480))
 			active_block_y <= active_block_y + BLOCK_SIZE;
+			for (p = 0; p < grid_block_width; p = p + 1) begin
+				under_intersect[p] = placedblocks[(x_ind + y_ind + 10 - p)] == 1;
+			end
+			for (q = 0; q < grid_block_height * 10; q = q + 10) begin
+				l_intersect[q] = placedblocks[(x_width_ind + y_ind - 1 + q)] == 1;
+				r_intersect[q] = placedblocks[(x_ind + y_ind + 1 + q)] == 1;
+			end
 		// we move left to right during dropping
-		if (left_en && active_block_x > PLAYAREA_START)
+		if (left_en && active_block_x > PLAYAREA_START && !test_l_intersect )
 			active_block_x <= active_block_x - BLOCK_SIZE;
 			// active_block_x = active_block_x - 1; // To make jumps less big
-		if (right_en && active_block_x + active_block_width < PLAYAREA_END)
+		if (right_en && active_block_x + active_block_width < PLAYAREA_END && !test_r_intersect)
 			active_block_x <= active_block_x + BLOCK_SIZE;
 			// active_block_x = active_block_x + 1; // To make jumps less big
 		if (place_block) begin
@@ -259,6 +285,17 @@ module VGAControllerTetris(
 			active_block_x <= 288;
 			active_block_y <= 0;
 			new_block_rdy <= 1'b1;
+		end
+		if (shift) begin
+			if (row == 0) begin
+				placedblocks[row +: 9] <= 10'b0;
+			end else begin
+				for (i = 0; i < placedblocks_h; i = i +10) begin
+					placedblocks[row - i+: 9] <= placedblocks[row - i -10 +: 9];
+				end
+				placedblocks[149 : 140] <= 10'b0;
+				row <= row - 10;
+			end
 		end
 		if (gameover) begin
 			

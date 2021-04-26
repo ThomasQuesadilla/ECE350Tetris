@@ -55,3 +55,9 @@ set_property PACKAGE_PIN M18 [get_ports up]
 
 set_property IOSTANDARD LVCMOS33 [get_ports clock]
 set_property PACKAGE_PIN E3 [get_ports clock]
+
+set_property IOSTANDARD LVCMOS33 [get_ports {random_block[1]}]
+set_property IOSTANDARD LVCMOS33 [get_ports {random_block[0]}]
+
+set_property PACKAGE_PIN V10 [get_ports {random_block[1]}]
+set_property PACKAGE_PIN V11 [get_ports {random_block[0]}]

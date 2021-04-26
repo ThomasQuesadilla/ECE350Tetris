@@ -37,17 +37,17 @@ module VGAControllerTetris(
 	reg[8:0] active_block_width = 64; // we switch between blocks
 
 
-	// reg[1:0] block_type = 2'b11;
+	reg[1:0] block_type = 2'b00;
 	
-	reg[1:0] block_type;
-	always@(random_block) begin
-	   block_type = random_block;
-	end
+	// reg[1:0] block_type;
+	// always@(random_block) begin
+	//    block_type = random_block;
+	// end
 	
 
 	// Lab Memory Files Location
-	// localparam FILES_PATH = "//tsclient/ECE350-Toolchain-Mac/Lab5/";
-	localparam FILES_PATH = "C:/Users/eve65/Downloads/ECE350Tetris/Lab5/";
+	localparam FILES_PATH = "//tsclient/ECE350-Toolchain-Mac/Lab5/";
+	// localparam FILES_PATH = "C:/Users/eve65/Downloads/ECE350Tetris/Lab5/";
 	localparam MHz = 1000000;
 	localparam SYSTEM_FREQ = 25*MHz;
 	// Clock divider 100 MHz -> 25 MHz
@@ -144,9 +144,9 @@ module VGAControllerTetris(
 	wire[9:0] pixel_x_ind, pixel_y_ind, placedblocks_ind;
 	wire[9:0] x_ind, y_ind, x_width_ind, y_height_ind, active_block_grid_height, active_block_grid_width;
 	
-	assign x_ind = ((active_block_x - PLAYAREA_START) >> 5) + 1;
+	assign x_ind = ((active_block_x - PLAYAREA_START) >> 5);
 	assign y_ind = (active_block_y >> 5) * GRID_WIDTH;
-	assign x_width_ind = ((active_block_x + active_block_width - PLAYAREA_START) >> 5) - 1 ;
+	assign x_width_ind = ((active_block_x + active_block_width - PLAYAREA_START) >> 5);
 	assign y_height_ind = ((active_block_y + active_block_height) >> 5) * GRID_WIDTH;
 	assign active_block_grid_width = active_block_width >> 5;
 	assign active_block_grid_height = active_block_height >> 5;
@@ -218,9 +218,9 @@ module VGAControllerTetris(
 	end
 
 	wire shift;
+	reg[7:0] row;
 	wire[7:0] placedblocks_h;
 	assign shift = &placedblocks[row +: 9];
-	reg[7:0] row;
 	assign placedblocks_h = 149 - row;
 
 	integer i, j, n, p, q;
@@ -234,49 +234,42 @@ module VGAControllerTetris(
 		if (gameclk && (active_block_y + active_block_height < 480))
 			active_block_y <= active_block_y + BLOCK_SIZE;
 			for (p = 0; p < grid_block_width; p = p + 1) begin
-				under_intersect[p] = placedblocks[(x_ind + y_ind + 10 - p)] == 1;
+				under_intersect[p] = placedblocks[(x_ind + y_height_ind + p)] == 1;
 			end
 			for (q = 0; q < grid_block_height * 10; q = q + 10) begin
-				l_intersect[q] = placedblocks[(x_width_ind + y_ind - 1 + q)] == 1;
-				r_intersect[q] = placedblocks[(x_ind + y_ind + 1 + q)] == 1;
+				l_intersect[q] = placedblocks[(x_ind + y_ind - 1 + q)] == 1;
+				r_intersect[q] = placedblocks[(x_width_ind + y_ind + q)] == 1;
 			end
 		// we move left to right during dropping
 		if (left_en && active_block_x > PLAYAREA_START && !test_l_intersect )
 			active_block_x <= active_block_x - BLOCK_SIZE;
-			// active_block_x = active_block_x - 1; // To make jumps less big
 		if (right_en && active_block_x + active_block_width < PLAYAREA_END && !test_r_intersect)
 			active_block_x <= active_block_x + BLOCK_SIZE;
-			// active_block_x = active_block_x + 1; // To make jumps less big
 		if (place_block) begin
-			// for (i = 0; i < active_block_grid_height; i = i+1) begin
-			// 	// for ( j = 0; i < active_block_grid_width; j = j+1) begin
-			// 		placedblocks[(x_ind ) + (y_ind + j) * GRID_WIDTH : ] <= active_block_grid_width'b1;
-			// 	// end
-			// end
 			case (block_type)
 				2'b00 : begin
 					placedblocks[(x_ind) + (y_ind)] <= 1'b1;
-					placedblocks[(x_ind - 1) + (y_ind)] <= 1'b1;
-					placedblocks[(x_ind) + (y_ind - 10)] <= 1'b1;
-					placedblocks[(x_ind - 1) + (y_ind - 10)] <= 1'b1;
+					placedblocks[(x_ind + 1) + (y_ind)] <= 1'b1;
+					placedblocks[(x_ind) + (y_ind + 10)] <= 1'b1;
+					placedblocks[(x_ind + 1) + (y_ind + 10)] <= 1'b1;
 				end
 				2'b01 : begin
 					placedblocks[(x_ind) + (y_ind)] <= 1'b1;
-					placedblocks[(x_ind) + (y_ind - 10)] <= 1'b1;
-					placedblocks[(x_ind) + (y_ind - 20)] <= 1'b1;
-					placedblocks[(x_ind) + (y_ind - 30)] <= 1'b1;
+					placedblocks[(x_ind) + (y_ind + 10)] <= 1'b1;
+					placedblocks[(x_ind) + (y_ind + 20)] <= 1'b1;
+					placedblocks[(x_ind) + (y_ind + 30)] <= 1'b1;
 				end
 				2'b10 : begin
 					placedblocks[(x_ind) + (y_ind)] <= 1'b1;
-					placedblocks[(x_ind - 1) + (y_ind)] <= 1'b1;
-					placedblocks[(x_ind - 2) + (y_ind)] <= 1'b1;
-					placedblocks[(x_ind - 3) + (y_ind)] <= 1'b1;
+					placedblocks[(x_ind + 1) + (y_ind)] <= 1'b1;
+					placedblocks[(x_ind + 2) + (y_ind)] <= 1'b1;
+					placedblocks[(x_ind + 3) + (y_ind)] <= 1'b1;
 				end
 				default : begin
 					placedblocks[(x_ind) + (y_ind)] <= 1'b1;
-					placedblocks[(x_ind - 1) + (y_ind)] <= 1'b1;
-					placedblocks[(x_ind) + (y_ind - 10)] <= 1'b1;
-					placedblocks[(x_ind - 1) + (y_ind - 10)] <= 1'b1;
+					placedblocks[(x_ind + 1) + (y_ind)] <= 1'b1;
+					placedblocks[(x_ind) + (y_ind + 10)] <= 1'b1;
+					placedblocks[(x_ind + 1) + (y_ind + 10)] <= 1'b1;
 				end
 			endcase
 			// for ( n=0 ; n < 150 ; n=n+1 ) begin 
@@ -301,50 +294,8 @@ module VGAControllerTetris(
 			
 		end
 
-		// missing case where block underneath is active_block_x < x < active_block_x + active_block_width, not inclusive
 	end
-	// case statement to add block to bus, doesn't work with if for some reason, at least not in prior @always
-	// feel free to play around with it
-	// always @(posedge place_block) begin
-	// 		// for (i = 0; i < active_block_grid_height; i = i+1) begin
-	// 		// 	for ( j = 0; i < active_block_grid_width; j = j+1) begin
-	// 		// 		placedblocks[(x_ind + i) + (y_ind + j) * GRID_WIDTH] <= 1'b1;
-	// 		// 	end
-	// 		// end
-	// 	case (block_type)
-	// 			2'b00 : begin
-	// 				placedblocks[(x_ind) + (y_ind)] <= 1'b1;
-	// 				placedblocks[(x_ind - 1) + (y_ind)] <= 1'b1;
-	// 				placedblocks[(x_ind) + (y_ind - 10)] <= 1'b1;
-	// 				placedblocks[(x_ind - 1) + (y_ind - 10)] <= 1'b1;
-	// 			end
-	// 			2'b01 : begin
-	// 				placedblocks[(x_ind) + (y_ind)] <= 1'b1;
-	// 				placedblocks[(x_ind) + (y_ind - 10)] <= 1'b1;
-	// 				placedblocks[(x_ind) + (y_ind - 20)] <= 1'b1;
-	// 				placedblocks[(x_ind) + (y_ind - 30)] <= 1'b1;
-	// 			end
-	// 			2'b10 : begin
-	// 				placedblocks[(x_ind) + (y_ind)] <= 1'b1;
-	// 				placedblocks[(x_ind - 1) + (y_ind)] <= 1'b1;
-	// 				placedblocks[(x_ind - 2) + (y_ind)] <= 1'b1;
-	// 				placedblocks[(x_ind - 3) + (y_ind)] <= 1'b1;
-	// 			end
-	// 			default : begin
-	// 				placedblocks[(x_ind) + (y_ind)] <= 1'b1;
-	// 				placedblocks[(x_ind - 1) + (y_ind)] <= 1'b1;
-	// 				placedblocks[(x_ind) + (y_ind - 10)] <= 1'b1;
-	// 				placedblocks[(x_ind - 1) + (y_ind - 10)] <= 1'b1;
-	// 			end
-	// 	endcase
-	// 	// for ( n=0 ; n < 150 ; n=n+1 ) begin 
-	// 	// 	placedblocks[n] <= placedblocks_rev[149-n]; // Reverse video data buss bit order 
-	// 	// end 
-	// end
-	// always @(posedge screenEnd) begin
-	// end
-	// always @(posedge screenEnd) begin
-	// end
+
 
 	
 	

@@ -7,15 +7,9 @@ nop
 nop
 nop
 # initialize registers
-<<<<<<< HEAD
-addi $r1, $r1, 1 # r1 = 1
-addi $r2, $r2, 5 # r2 = 5
-lnf $r1, $r2, 3
-=======
 addi $r1, $r1, 5 # r1 = 5
 addi $r2, $r2, 2 # r2 = 2
 lnf $r1, $r2, 3 # r1 = 2
->>>>>>> e99ee003123c7ef04422b527b9040de5f86a905a
 nop
 nop
 lnf $r1, $r2, 2

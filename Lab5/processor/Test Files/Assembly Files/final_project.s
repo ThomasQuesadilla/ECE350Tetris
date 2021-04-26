@@ -10,63 +10,65 @@ nop
 addi $r1, $r1, 5 # r1 = 5
 addi $r2, $r2, 2 # r2 = 2
 lnf $r1, $r2, 3 # r1 = 2
-nop
-nop
 lnf $r1, $r2, 2
-nop
-nop
 lnf $r1, $r2, 1
-nop
-nop
 lnf $r1, $r2, 3
-nop
-nop
 lnf $r1, $r2, 2
-nop
-nop
 lnf $r1, $r2, 1
-nop
-nop
 lnf $r1, $r2, 3
-nop
-nop
 lnf $r1, $r2, 2
-nop
-nop
 lnf $r1, $r2, 1
-nop
-nop
 lnf $r1, $r2, 3
-nop
-nop
 lnf $r1, $r2, 2
-nop
-nop
 lnf $r1, $r2, 1
-nop
-nop
 lnf $r1, $r2, 3
-nop
-nop
 lnf $r1, $r2, 2
-nop
-nop
 lnf $r1, $r2, 1
-nop
-nop
 lnf $r1, $r2, 3
-nop
-nop
 lnf $r1, $r2, 2
-nop
-nop
 lnf $r1, $r2, 1
-nop
-nop
 lnf $r1, $r2, 3
-nop
-nop
 lnf $r1, $r2, 2
-nop
-nop
+lnf $r1, $r2, 1
+lnf $r1, $r2, 3
+lnf $r1, $r2, 2
+lnf $r1, $r2, 1
+lnf $r1, $r2, 3
+lnf $r1, $r2, 2
+lnf $r1, $r2, 1
+lnf $r1, $r2, 3
+lnf $r1, $r2, 2
+lnf $r1, $r2, 1
+lnf $r1, $r2, 3
+lnf $r1, $r2, 2
+lnf $r1, $r2, 1
+lnf $r1, $r2, 3
+lnf $r1, $r2, 2
+lnf $r1, $r2, 1
+lnf $r1, $r2, 3
+lnf $r1, $r2, 2
+lnf $r1, $r2, 1
+lnf $r1, $r2, 3
+lnf $r1, $r2, 2
+lnf $r1, $r2, 1
+lnf $r1, $r2, 3
+lnf $r1, $r2, 2
+lnf $r1, $r2, 1
+lnf $r1, $r2, 3
+lnf $r1, $r2, 2
+lnf $r1, $r2, 1
+lnf $r1, $r2, 3
+lnf $r1, $r2, 2
+lnf $r1, $r2, 1
+lnf $r1, $r2, 3
+lnf $r1, $r2, 2
+lnf $r1, $r2, 1
+lnf $r1, $r2, 3
+lnf $r1, $r2, 2
+lnf $r1, $r2, 1
+lnf $r1, $r2, 3
+lnf $r1, $r2, 2
+lnf $r1, $r2, 1
+lnf $r1, $r2, 3
+lnf $r1, $r2, 2
 lnf $r1, $r2, 1
